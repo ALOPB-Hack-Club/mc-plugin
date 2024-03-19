@@ -1,0 +1,4 @@
+name: plugin-template
+version: '${version}'
+main: com.hackclub.alopb.plugintemplate.Plugin_template
+api-version: '1.20'
