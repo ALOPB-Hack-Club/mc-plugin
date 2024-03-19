@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -21,10 +22,10 @@ repositories {
 
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {
@@ -50,7 +51,7 @@ processResources {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 idea {
