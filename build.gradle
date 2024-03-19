@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'idea'
     id 'org.jetbrains.kotlin.jvm'
 }
 
@@ -47,6 +48,13 @@ processResources {
         expand props
     }
 }
+
 kotlin {
     jvmToolchain(17)
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+    }
 }
