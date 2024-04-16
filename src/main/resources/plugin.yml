@@ -7,3 +7,5 @@ commands:
     description: Launches the player
   tntbow:
     description: Gives an explosive bow
+  mygui:
+    description: Opens the custom inventory

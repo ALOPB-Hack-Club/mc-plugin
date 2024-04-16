@@ -6,6 +6,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attribute
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -20,6 +21,8 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.event.entity.FireworkExplodeEvent
 import org.bukkit.event.entity.ProjectileHitEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
@@ -32,8 +35,9 @@ class Plugin_template : JavaPlugin() {
         // Plugin startup logic
         getCommand("jump")?.setExecutor(JumpCommand())
         getCommand("tntbow")?.setExecutor(TntBowCommand())
+        getCommand("mygui")?.setExecutor(OpenCustomInventory())
 
-        val enderPortalFrame = ItemStack(Material.END_PORTAL_FRAME, 1)
+        val enderPortalFrame = ItemStack(Material.WATER, 2)
         val recipe = ShapedRecipe(NamespacedKey(this, "frame"), enderPortalFrame)
 //         shape(pierwszy rząd, drugi rząd, trzeci rząd), musimy zdefiniować, czym jest X
 //         spacja to jest puste pole
@@ -50,10 +54,54 @@ class Plugin_template : JavaPlugin() {
         server.pluginManager.registerEvents(BowShootEvent(), this)
         server.pluginManager.registerEvents(SnowballHitEvent(), this)
         server.pluginManager.registerEvents(FireworkLauncher(), this)
+        server.pluginManager.registerEvents(SetMaxHealthOnJoin(), this)
+        server.pluginManager.registerEvents(InventoryClick(), this)
     }
 
     override fun onDisable() {
         // Plugin shutdown logic
+    }
+}
+
+class OpenCustomInventory: CommandExecutor {
+    override fun onCommand(sender: CommandSender, p1: Command, p2: String, p3: Array<out String>?): Boolean {
+        if (sender is Player) {
+            val inventory = Bukkit.createInventory(sender, 9, Component.text("My Inventory"))
+
+            val diamond = ItemStack(Material.DIAMOND)
+            inventory.setItem(4, diamond)
+
+            sender.openInventory(inventory)
+        }
+
+        return true
+    }
+}
+
+class InventoryClick: Listener {
+    @EventHandler
+    fun onInventoryClick(event: InventoryClickEvent) {
+        val player = event.whoClicked
+        val item = event.currentItem
+
+        player.sendMessage("Slot ${event.slot}")
+        val isTopBar = event.slot in 0..8
+        val isCustomInventory = event.view.title() == Component.text("My Inventory")
+
+        if (item?.type == Material.DIAMOND && isTopBar && isCustomInventory) {
+            player.sendMessage("You cannot pick this item up.")
+            event.isCancelled = true
+        }
+    }
+}
+
+class SetMaxHealthOnJoin: Listener {
+    @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        player.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue = 100.0
+//        player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)?.baseValue = 2.0
+        player.health = 100.0
     }
 }
 
